@@ -1,22 +1,22 @@
-"use client"
+'use client'
 
-import { motion } from "framer-motion"
-import Link from "next/link"
-import { useState, useEffect } from "react"
-import { ArrowRight } from "lucide-react"
+import { motion } from 'framer-motion'
+import Link from 'next/link'
+import { useState, useEffect } from 'react'
+import { ArrowRight } from 'lucide-react'
 
 export default function RoleSelectionPage() {
-  const [selectedRole, setSelectedRole] = useState<string>("")
+  const [selectedRole, setSelectedRole] = useState<string>('')
   const [isHydrated, setIsHydrated] = useState(false)
 
   useEffect(() => {
     setIsHydrated(true)
-    const stored = localStorage.getItem("selectedRole")
+    const stored = localStorage.getItem('selectedRole')
     if (stored) setSelectedRole(stored)
   }, [])
 
   const handleContinue = () => {
-    localStorage.setItem("selectedRole", selectedRole)
+    localStorage.setItem('selectedRole', selectedRole)
   }
 
   const containerVariants = {
@@ -32,28 +32,18 @@ export default function RoleSelectionPage() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
   }
 
-  const roleVariants = {
-    hover: { scale: 1.05, transition: { duration: 0.2 } },
-  }
-
   const roles = [
     {
-      id: "mentor",
-      title: "Mentor",
-      description: "Guide and inspire the next generation of professionals",
-      icon: "👨‍🏫",
+      id: 'mentor',
+      title: 'Mentor',
+      description: 'Guide and inspire the next generation of professionals',
+      icon: '👨‍🏫',
     },
     {
-      id: "mentee",
-      title: "Mentee",
-      description: "Learn and grow from experienced industry leaders",
-      icon: "🎓",
-    },
-    {
-      id: "both",
-      title: "Both",
-      description: "Be a mentor and a mentee - grow together",
-      icon: "🤝",
+      id: 'mentee',
+      title: 'Mentee',
+      description: 'Learn and grow from experienced industry leaders',
+      icon: '🎓',
     },
   ]
 
@@ -89,8 +79,8 @@ export default function RoleSelectionPage() {
               onClick={() => setSelectedRole(role.id)}
               className={`p-8 rounded-xl border-2 transition-all text-left ${
                 selectedRole === role.id
-                  ? "border-primary bg-primary/5"
-                  : "border-border bg-card hover:border-primary/30"
+                  ? 'border-primary bg-primary/5'
+                  : 'border-border bg-card hover:border-primary/30'
               }`}
             >
               <div className="text-4xl mb-4">{role.icon}</div>

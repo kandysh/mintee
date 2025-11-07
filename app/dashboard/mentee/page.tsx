@@ -8,7 +8,6 @@ import { PreferenceForm } from "@/components/shared/preference-form"
 import { TopBar } from "@/components/top-bar"
 
 export default function MenteeDashboardPage() {
-  const [selectedRole, setSelectedRole] = useState<string>("")
   const [isHydrated, setIsHydrated] = useState(false)
   const [showPreferencesSidebar, setShowPreferencesSidebar] = useState(false)
   const [assignedMentors, setAssignedMentors] = useState([
@@ -18,8 +17,6 @@ export default function MenteeDashboardPage() {
 
   useEffect(() => {
     setIsHydrated(true)
-    const stored = localStorage.getItem("selectedRole")
-    if (stored) setSelectedRole(stored)
   }, [])
 
   const removeMentor = (id: number) => {
@@ -68,7 +65,7 @@ export default function MenteeDashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-primary/5">
-      <TopBar selectedRole={selectedRole} />
+      <TopBar />
 
       <motion.div
         className="max-w-6xl mx-auto py-12 px-4"

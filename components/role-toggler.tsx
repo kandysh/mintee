@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -7,16 +7,11 @@ import { BookOpen, Users } from "lucide-react"
 
 interface RoleTogglerProps {
   currentRole: "mentor" | "mentee"
-  hasMultipleRoles: boolean
 }
 
-export function RoleToggler({ currentRole, hasMultipleRoles }: RoleTogglerProps) {
+export function RoleToggler({ currentRole }: RoleTogglerProps) {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
-
-  if (!hasMultipleRoles) {
-    return null
-  }
 
   const roles = [
     { id: "mentor", label: "Mentor", icon: BookOpen },
