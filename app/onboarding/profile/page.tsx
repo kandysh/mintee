@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import { containerVariants } from '@/lib/animations'
+import { containerVariants, itemVariants } from '@/lib/animations'
 import { ProgressBar } from '@/components/profile-wizard/ProgressBar'
 import { StepContent } from '@/components/profile-wizard/StepContent'
 import { WizardNavigation } from '@/components/profile-wizard/WizardNavigation'
@@ -79,6 +79,14 @@ export default function ProfileWizardPage() {
         animate="visible"
       >
         <ProgressBar step={step} totalSteps={4} />
+        <motion.div variants={itemVariants} className="text-center my-8">
+          <h1 className="text-4xl font-serif font-bold capitalize">
+            {role} Profile
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            Complete your profile to get matched.
+          </p>
+        </motion.div>
         <StepContent
           step={step}
           multiSelectOptions={multiSelectOptions}
