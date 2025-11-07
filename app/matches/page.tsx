@@ -173,7 +173,7 @@ export default function MatchesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <TopBar currentRole={role} />
+      <TopBar />
       <main className="py-12 px-4 bg-gradient-to-br from-background to-primary/5">
         <motion.div
           className="max-w-6xl mx-auto"
