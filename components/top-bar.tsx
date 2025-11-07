@@ -1,18 +1,43 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { LogOut } from "lucide-react"
+import { LogOut, ChevronDown, Moon, Sun } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { ThemeToggler } from "./theme-toggler"
-import { RoleToggler } from "./role-toggler"
+import Link from "next/link"
+import { useState, useEffect } from 'react'
 
 interface TopBarProps {
-  currentRole: "mentor" | "mentee"
-  hasMultipleRoles: boolean
+  selectedRole: string;
 }
 
-export function TopBar({ currentRole, hasMultipleRoles }: TopBarProps) {
+export function TopBar({ selectedRole }: TopBarProps) {
   const router = useRouter()
+  const [theme, setTheme] = useState<"light" | "dark">("light")
+  const [isHydrated, setIsHydrated] = useState(false)
+
+  useEffect(() => {
+    setIsHydrated(true)
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+    const storedTheme = localStorage.getItem("theme") as "light" | "dark" | null
+    const currentTheme = storedTheme || (prefersDark ? "dark" : "light")
+    setTheme(currentTheme)
+    document.documentElement.classList.toggle("dark", currentTheme === "dark")
+  }, [])
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light"
+    setTheme(newTheme)
+    localStorage.setItem("theme", newTheme)
+    document.documentElement.classList.toggle("dark", newTheme === "dark")
+  }
+
+  const handleRoleChange = (role: string) => {
+    if (role === "mentor") {
+      window.location.href = "/dashboard/mentor"
+    } else if (role === "mentee") {
+      window.location.href = "/dashboard/mentee"
+    }
+  }
 
   const handleLogout = () => {
     localStorage.removeItem("userRole")
@@ -20,31 +45,59 @@ export function TopBar({ currentRole, hasMultipleRoles }: TopBarProps) {
     router.push("/")
   }
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="border-b border-border/50 bg-background/80 backdrop-blur-sm px-6 lg:px-8 py-4 flex items-center justify-between"
-    >
-      <div>
-        <h1 className="text-xl font-semibold text-foreground">
-          {currentRole === "mentor" ? "Mentor Dashboard" : "Mentee Dashboard"}
-        </h1>
-      </div>
+  if (!isHydrated) return null
 
-      <div className="flex items-center gap-2">
-        <ThemeToggler />
-        <RoleToggler currentRole={currentRole} hasMultipleRoles={hasMultipleRoles} />
-        <motion.button
-          onClick={handleLogout}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="p-2 rounded-lg hover:bg-muted transition-colors text-destructive hover:bg-destructive/10"
-          aria-label="Logout"
-        >
-          <LogOut className="w-5 h-5" />
-        </motion.button>
+  return (
+    <div className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-border">
+      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+        <Link href="/">
+          <h1 className="text-2xl font-serif font-bold">MentorHub</h1>
+        </Link>
+        <div className="flex items-center justify-end gap-4">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-lg border border-border hover:bg-card transition-colors"
+            title="Toggle theme"
+          >
+            {theme === "light" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+          </button>
+            <div className="relative group">
+              <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card hover:bg-accent/5 transition-colors">
+                Switch Role
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              <div className="absolute right-0 top-full mt-2 w-32 bg-card border border-border rounded-lg shadow-lg hidden group-hover:block z-50">
+                <button
+                  onClick={() => handleRoleChange("mentor")}
+                  className="w-full text-left px-4 py-2 hover:bg-accent/10 transition-colors rounded-t-lg"
+                >
+                  Mentor
+                </button>
+                <button
+                  onClick={() => handleRoleChange("mentee")}
+                  className="w-full text-left px-4 py-2 hover:bg-accent/10 transition-colors rounded-b-lg"
+                >
+                  Mentee
+                </button>
+              </div>
+            </div>
+          <Link href="/profile">
+            <button className="px-4 py-2 rounded-lg border border-border bg-card hover:bg-accent/5 transition-colors">
+              View Profile
+            </button>
+          </Link>
+
+          <motion.button
+            onClick={handleLogout}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-2 rounded-lg hover:bg-muted transition-colors text-destructive hover:bg-destructive/10"
+            aria-label="Logout"
+          >
+            <LogOut className="w-5 h-5" />
+          </motion.button>
+        </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
