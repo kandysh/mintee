@@ -22,7 +22,7 @@ export function RoleToggler({ currentRole }: RoleTogglerProps) {
     if (role !== currentRole) {
       localStorage.setItem("currentRole", role)
       setIsOpen(false)
-      router.push("/dashboard")
+      router.push(`/dashboard/${currentRole}`)
     }
   }
 
