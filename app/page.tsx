@@ -37,7 +37,7 @@ export default function LandingPage() {
 
         {/* Arrow button to role selection */}
         <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}>
-          <Link href="/select-role">
+          <Link href="/onboarding">
             <button className="group relative inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110">
               <ChevronDown className="w-8 h-8 text-primary-foreground group-hover:translate-y-1 transition-transform duration-300" />
             </button>

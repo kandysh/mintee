@@ -76,7 +76,7 @@
 }
 
 @theme inline {
-  --font-sans: 'Rajdhani', 'Rajdhani Fallback';
+  --font-sans: "Rajdhani", "Rajdhani Fallback";
   --font-serif: "Fraunces", "Fraunces Fallback";
   --font-mono: "Fira Code", "Fira Code Fallback";
   --color-background: var(--background);
@@ -135,6 +135,20 @@
   }
   h4 {
     @apply font-sans text-lg font-semibold;
+  }
+
+  /* styled number input to hide default arrows and add custom styling */
+  input[type="number"] {
+    @apply appearance-none;
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    @apply appearance-none m-0;
+  }
+
+  input[type="number"] {
+    @apply relative;
   }
 }
 

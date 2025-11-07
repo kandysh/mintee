@@ -60,16 +60,18 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                   className="inline-flex items-center gap-1 px-2 py-1 bg-accent/20 text-accent rounded-md text-sm"
                 >
                   {label}
-                  <button
+                  <div
                     onClick={(e) => {
                       e.stopPropagation()
                       const value = options.find((opt) => opt.label === label)?.value
-                      if (value) handleRemove(value, e)
+                      if (value) handleRemove(value, e as any)
                     }}
-                    className="hover:bg-accent/30 rounded p-0.5 transition-colors"
+                    className="hover:bg-accent/30 rounded p-0.5 transition-colors cursor-pointer"
+                    role="button"
+                    tabIndex={0}
                   >
                     <X className="w-3 h-3" />
-                  </button>
+                  </div>
                 </motion.span>
               ))
             ) : (
