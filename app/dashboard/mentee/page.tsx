@@ -1,11 +1,12 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Star, Search, Settings, Trash2 } from "lucide-react"
+import { Star, Search, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { PreferenceForm } from "@/components/shared/preference-form"
 import { TopBar } from "@/components/top-bar"
+import { DashboardHeader } from "@/components/dashboard-header"
 
 export default function MenteeDashboardPage() {
   const [isHydrated, setIsHydrated] = useState(false)
@@ -73,22 +74,11 @@ export default function MenteeDashboardPage() {
         initial="hidden"
         animate="visible"
       >
-        {/* Header with Edit Preferences */}
-        <motion.div variants={itemVariants} className="mb-12 flex items-start justify-between">
-          <div>
-            <h1 className="text-5xl font-serif font-bold mb-2">Welcome back, Jamie</h1>
-            <p className="text-lg text-muted-foreground">Continue your learning journey with your mentors</p>
-          </div>
-          <motion.button
-            onClick={() => setShowPreferencesSidebar(true)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:shadow-lg transition-all"
-          >
-            <Settings className="w-5 h-5" />
-            Edit Preferences
-          </motion.button>
-        </motion.div>
+        <DashboardHeader
+          title="Welcome back, Jamie"
+          subtitle="Continue your learning journey with your mentors"
+          onEditPreferences={() => setShowPreferencesSidebar(true)}
+        />
 
         {/* Assigned Mentors */}
         <motion.div variants={itemVariants} className="mb-12">
@@ -144,7 +134,7 @@ export default function MenteeDashboardPage() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:shadow-lg transition-all text-sm"
+                className="flex items-center gap-2 px-4 py-2 p-2 rounded-lg hover:bg-muted transition-colors font-semibold hover:shadow-lg transition-all text-sm"
               >
                 <Search className="w-4 h-4" />
                 Explore All

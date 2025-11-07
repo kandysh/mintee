@@ -1,11 +1,11 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { MessageSquare, Users, TrendingUp, Eye, Settings, Trash2 } from "lucide-react"
+import { MessageSquare, Users, TrendingUp, Eye, Trash2 } from "lucide-react"
 import { useState, useEffect } from "react"
-import Link from "next/link"
 import { PreferenceForm } from "@/components/shared/preference-form"
 import { TopBar } from "@/components/top-bar"
+import { DashboardHeader } from "@/components/dashboard-header"
 
 export default function MentorDashboardPage() {
   const [isHydrated, setIsHydrated] = useState(false)
@@ -59,22 +59,11 @@ export default function MentorDashboardPage() {
         initial="hidden"
         animate="visible"
       >
-        {/* Header */}
-        <motion.div variants={itemVariants} className="mb-12 flex items-start justify-between">
-          <div>
-            <h1 className="text-5xl font-serif font-bold mb-2">Welcome back, Alex</h1>
-            <p className="text-lg text-muted-foreground">You're making a difference in others' careers</p>
-          </div>
-          <motion.button
-            onClick={() => setShowPreferencesSidebar(true)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:shadow-lg transition-all"
-          >
-            <Settings className="w-5 h-5" />
-            Edit Preferences
-          </motion.button>
-        </motion.div>
+        <DashboardHeader
+          title="Welcome back, Alex"
+          subtitle="You're making a difference in others' careers"
+          onEditPreferences={() => setShowPreferencesSidebar(true)}
+        />
 
         {/* Stats */}
         <motion.div className="grid md:grid-cols-3 gap-6 mb-12" variants={containerVariants}>
