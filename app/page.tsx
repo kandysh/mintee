@@ -4,6 +4,7 @@ import Link from "next/link"
 import { ChevronDown } from "lucide-react"
 import { motion } from "framer-motion"
 import { fadeInUp, containerVariants } from "../lib/animations"
+import { Button } from "@/components/ui/button"
 
 export default function LandingPage() {
   return (
@@ -51,9 +52,10 @@ export default function LandingPage() {
           variants={fadeInUp}
         >
           <Link href="/onboarding">
-            <button className="group relative inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110">
-              <ChevronDown className="w-8 h-8 text-primary-foreground group-hover:translate-y-1 transition-transform duration-300" />
-            </button>
+            <Button size="lg" className="group">
+              Get Started
+              <ChevronDown className="w-5 h-5 ml-2 text-primary-foreground group-hover:translate-y-1 transition-transform duration-300" />
+            </Button>
           </Link>
         </motion.div>
 

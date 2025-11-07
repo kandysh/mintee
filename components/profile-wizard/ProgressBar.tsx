@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { itemVariants } from "@/lib/animations"
+import { Progress } from "@/components/ui/progress"
 
 interface ProgressBarProps {
   step: number
@@ -9,23 +10,16 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({ step, totalSteps }: ProgressBarProps) {
+  const progressPercentage = (step / totalSteps) * 100;
+
   return (
     <motion.div variants={itemVariants} className="mb-8">
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2">
         <span className="text-sm text-muted-foreground">
           Step {step} of {totalSteps}
         </span>
-        <div className="flex gap-2">
-          {Array.from({ length: totalSteps }, (_, i) => i + 1).map((s) => (
-            <div
-              key={s}
-              className={`h-1 w-8 rounded-full ${
-                s <= step ? "bg-primary" : "bg-border"
-              }`}
-            />
-          ))}
-        </div>
       </div>
+      <Progress value={progressPercentage} />
     </motion.div>
   )
 }

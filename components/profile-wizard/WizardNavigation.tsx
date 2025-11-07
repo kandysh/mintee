@@ -3,7 +3,8 @@
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { ArrowRight, ChevronLeft } from "lucide-react"
-import { itemVariants, scale } from "@/lib/animations"
+import { itemVariants } from "@/lib/animations"
+import { Button } from "@/components/ui/button"
 
 interface WizardNavigationProps {
   step: number
@@ -22,41 +23,26 @@ export function WizardNavigation({
 }: WizardNavigationProps) {
   return (
     <motion.div variants={itemVariants} className="flex justify-between mt-12 gap-4">
-      <motion.button
-        variants={scale}
-        whileHover="hover"
-        whileTap="tap"
+      <Button
+        variant="outline"
         onClick={() => setStep(Math.max(1, step - 1))}
         disabled={step === 1}
-        className="flex items-center gap-2 px-6 py-3 rounded-lg border border-border text-foreground hover:bg-card disabled:opacity-50 disabled:cursor-not-allowed transition-all"
       >
-        <ChevronLeft className="w-5 h-5" />
+        <ChevronLeft className="w-5 h-5 mr-2" />
         Back
-      </motion.button>
+      </Button>
 
       {step < totalSteps ? (
-        <motion.button
-          variants={scale}
-          whileHover="hover"
-          whileTap="tap"
-          onClick={() => setStep(step + 1)}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-lg font-semibold hover:shadow-lg transition-all ml-auto"
-        >
+        <Button onClick={() => setStep(step + 1)}>
           Next
-          <ArrowRight className="w-5 h-5" />
-        </motion.button>
+          <ArrowRight className="w-5 h-5 ml-2" />
+        </Button>
       ) : (
-        <Link href={`/dashboard/${role}`}>
-          <motion.button
-            variants={scale}
-            whileHover="hover"
-            whileTap="tap"
-            onClick={handleFinish}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-lg font-semibold hover:shadow-lg transition-all"
-          >
+        <Link href={`/dashboard/${role}`} onClick={handleFinish}>
+          <Button>
             Finish Setup
-            <ArrowRight className="w-5 h-5" />
-          </motion.button>
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
         </Link>
       )}
     </motion.div>
