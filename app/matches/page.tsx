@@ -3,6 +3,13 @@
 import { motion } from "framer-motion"
 import { Search, Star } from "lucide-react"
 import { useState, useEffect, useRef, useCallback } from "react"
+import {
+    containerVariants,
+    itemVariants,
+    scale,
+    hoverY,
+    fadeIn,
+} from "@/lib/animations"
 
 export default function MatchesPage() {
   const [selectedFilter, setSelectedFilter] = useState<string>("")
@@ -149,16 +156,6 @@ export default function MatchesPage() {
 
   const filters = ["All", "Product", "Technology", "Operations", "Leadership"]
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-primary/5 py-12 px-4">
       <motion.div className="max-w-6xl mx-auto" variants={containerVariants} initial="hidden" animate="visible">
@@ -182,8 +179,9 @@ export default function MatchesPage() {
             {filters.map((filter) => (
               <motion.button
                 key={filter}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                variants={scale}
+                whileHover="hover"
+                whileTap="tap"
                 onClick={() => setSelectedFilter(filter)}
                 className={`px-4 py-2 rounded-full transition-all ${
                   selectedFilter === filter || (!selectedFilter && filter === "All")
@@ -203,7 +201,7 @@ export default function MatchesPage() {
             <motion.div
               key={mentor.id}
               variants={itemVariants}
-              whileHover={{ y: -8 }}
+              whileHover="hoverY"
               className="p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all cursor-pointer group"
             >
               <div className="mb-4">
@@ -256,8 +254,9 @@ export default function MatchesPage() {
 
               {/* CTA */}
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                variants={scale}
+                whileHover="hover"
+                whileTap="tap"
                 className="w-full px-4 py-2 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-lg font-semibold hover:shadow-lg transition-all group-hover:shadow-lg"
               >
                 View Profile
@@ -270,8 +269,9 @@ export default function MatchesPage() {
         <div ref={observerTarget} className="mt-12 flex justify-center">
           {isLoading && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              variants={fadeIn}
+              initial="hidden"
+              animate="visible"
               className="px-4 py-2 bg-card border border-border rounded-lg text-muted-foreground"
             >
               Loading more mentors...

@@ -4,6 +4,12 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { BookOpen, Users } from "lucide-react"
+import {
+  fadeInUp,
+  containerVariants,
+  itemVariants,
+  springIn,
+} from "@/lib/animations"
 
 export default function SelectRolePage() {
   const [selectedRole, setSelectedRole] = useState<"mentor" | "mentee" | null>(null)
@@ -42,25 +48,21 @@ export default function SelectRolePage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 px-4 py-20">
       <motion.div
         className="max-w-5xl mx-auto"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
       >
         {/* Header */}
         <div className="text-center mb-16">
           <motion.h1
             className="text-5xl md:text-6xl font-bold text-foreground mb-4"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
+            variants={fadeInUp}
           >
             Choose Your Path
           </motion.h1>
           <motion.p
             className="text-xl text-muted-foreground"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
+            variants={fadeInUp}
           >
             Tell us how you'd like to grow with MentorHub
           </motion.p>
@@ -75,9 +77,7 @@ export default function SelectRolePage() {
             return (
               <motion.div
                 key={role.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + index * 0.2, duration: 0.6 }}
+                variants={itemVariants}
               >
                 <button
                   onClick={() => setSelectedRole(role.id as "mentor" | "mentee")}
@@ -117,9 +117,9 @@ export default function SelectRolePage() {
                     {isSelected && (
                       <motion.div
                         className="absolute top-4 right-4 w-6 h-6 rounded-full bg-accent flex items-center justify-center"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: "spring", stiffness: 200 }}
+                        variants={springIn}
+                        initial="hidden"
+                        animate="visible"
                       >
                         <svg className="w-4 h-4 text-accent-foreground" fill="currentColor" viewBox="0 0 20 20">
                           <path
@@ -140,9 +140,7 @@ export default function SelectRolePage() {
         {/* Continue button */}
         <motion.div
           className="flex justify-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.6 }}
+          variants={itemVariants}
         >
           <button
             onClick={handleContinue}
