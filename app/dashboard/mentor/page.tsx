@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Users, Check, X, Target, MapPin, Languages, Trash2 } from "lucide-react"
+import { Users, Check, X, Target, MapPin, Languages, Trash2, Briefcase } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -15,7 +15,8 @@ export default function MentorDashboardPage() {
       id: 1, 
       name: "Sarah Johnson", 
       title: "Product Manager",
-      goals: "Career transition to product management", 
+      learningGoals: "Career transition to product management and developing strategic thinking skills",
+      jobCapabilities: "Product Strategy, Stakeholder Management, Roadmap Planning",
       region: "North America",
       languages: ["English", "Spanish"],
       joinDate: "2 weeks ago"
@@ -24,7 +25,8 @@ export default function MentorDashboardPage() {
       id: 2, 
       name: "Marcus Chen", 
       title: "Software Engineer",
-      goals: "Leadership skills development", 
+      learningGoals: "Leadership skills development and team management capabilities",
+      jobCapabilities: "Full-stack Development, System Design, Code Review",
       region: "Asia Pacific",
       languages: ["English", "Mandarin"],
       joinDate: "1 month ago"
@@ -33,7 +35,8 @@ export default function MentorDashboardPage() {
       id: 3, 
       name: "Alex Rodriguez", 
       title: "Senior Designer",
-      goals: "Transitioning to senior designer role", 
+      learningGoals: "Transitioning to senior designer role with focus on design leadership",
+      jobCapabilities: "UI/UX Design, Prototyping, Design Systems",
       region: "Europe",
       languages: ["English", "Portuguese"],
       joinDate: "3 weeks ago"
@@ -45,7 +48,8 @@ export default function MentorDashboardPage() {
       id: 4, 
       name: "Emma Wilson", 
       title: "Business Analyst",
-      goals: "Leadership development and team management", 
+      learningGoals: "Leadership development and team management skills",
+      jobCapabilities: "Data Analysis, Business Intelligence, Process Optimization",
       region: "North America",
       languages: ["English", "French"],
       requestDate: "3 days ago"
@@ -54,7 +58,8 @@ export default function MentorDashboardPage() {
       id: 5, 
       name: "David Park", 
       title: "Mid-level Developer",
-      goals: "Career growth in software engineering", 
+      learningGoals: "Career growth in software engineering and technical leadership",
+      jobCapabilities: "Backend Development, API Design, Database Management",
       region: "Asia Pacific",
       languages: ["English", "Korean"],
       requestDate: "1 day ago"
@@ -160,10 +165,27 @@ export default function MentorDashboardPage() {
                             </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground mb-2">{mentee.title}</p>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                            <Target className="w-4 h-4" />
-                            <span>{mentee.goals}</span>
+                          
+                          <div className="mb-2">
+                            <div className="flex items-start gap-2 text-sm">
+                              <Target className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                              <div>
+                                <span className="font-medium text-foreground">Learning Goals: </span>
+                                <span className="text-muted-foreground">{mentee.learningGoals}</span>
+                              </div>
+                            </div>
                           </div>
+
+                          <div className="mb-3">
+                            <div className="flex items-start gap-2 text-sm">
+                              <Briefcase className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" />
+                              <div>
+                                <span className="font-medium text-foreground">Job Capabilities: </span>
+                                <span className="text-muted-foreground">{mentee.jobCapabilities}</span>
+                              </div>
+                            </div>
+                          </div>
+
                           <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
                             <div className="flex items-center gap-1">
                               <MapPin className="w-4 h-4" />
@@ -219,11 +241,28 @@ export default function MentorDashboardPage() {
                             Pending
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground mb-2">{mentee.title}</p>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                          <Target className="w-4 h-4" />
-                          <span>{mentee.goals}</span>
+                        <p className="text-sm text-muted-foreground mb-3">{mentee.title}</p>
+                        
+                        <div className="mb-2">
+                          <div className="flex items-start gap-2 text-sm">
+                            <Target className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                            <div>
+                              <span className="font-medium text-foreground">Learning Goals: </span>
+                              <span className="text-muted-foreground">{mentee.learningGoals}</span>
+                            </div>
+                          </div>
                         </div>
+
+                        <div className="mb-3">
+                          <div className="flex items-start gap-2 text-sm">
+                            <Briefcase className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" />
+                            <div>
+                              <span className="font-medium text-foreground">Job Capabilities: </span>
+                              <span className="text-muted-foreground">{mentee.jobCapabilities}</span>
+                            </div>
+                          </div>
+                        </div>
+
                         <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
                           <div className="flex items-center gap-1">
                             <MapPin className="w-4 h-4" />
