@@ -10,8 +10,8 @@ RETURNS TABLE (
     learning_goal_score NUMERIC,
     job_capability_score NUMERIC,
     leadership_overlap INT,
-    additional_experiences TEXT[],
-    leadership_experiences TEXT[]
+    additional_experiences TEXT,
+    leadership_experiences TEXT
 )
 LANGUAGE sql
 AS $$
@@ -110,21 +110,11 @@ SELECT
           AND mle.mentor_id = mp.id
     ) AS leadership_overlap,
 
-    -- Additional experiences array
-    (
-        SELECT ARRAY_AGG(ae.name)
-        FROM mentor_additional_experiences mae
-        JOIN additional_experience ae ON ae.id = mae.additional_experience_id
-        WHERE mae.mentor_id = mp.id
-    ) AS additional_experiences,
+    -- Additional experiences from mentor profile
+    mp.additional_experiences AS additional_experiences,
 
-    -- Leadership experiences array
-    (
-        SELECT ARRAY_AGG(le.name)
-        FROM mentor_leadership_experiences mle
-        JOIN leadership_experience le ON le.id = mle.leadership_experience_id
-        WHERE mle.mentor_id = mp.id
-    ) AS leadership_experiences
+    -- Leadership experiences from mentor profile
+    mp.leadership_experiences AS leadership_experiences
 
 FROM mentor_profile mp
 JOIN users mu ON mu.id = mp.id
