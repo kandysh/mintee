@@ -87,7 +87,7 @@ export default function DashboardPage() {
           </motion.div>
           
           <h1 className="text-6xl font-serif font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Choose Your Path
+            Welcome to Your Dashboard
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Select your dashboard to begin your mentoring journey
