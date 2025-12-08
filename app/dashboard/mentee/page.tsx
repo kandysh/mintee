@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Star, Search, Trash2 } from "lucide-react"
+import { Search, MapPin, Languages } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { PreferenceForm } from "@/components/shared/preference-form"
@@ -12,8 +12,24 @@ export default function MenteeDashboardPage() {
   const [isHydrated, setIsHydrated] = useState(false)
   const [showPreferencesSidebar, setShowPreferencesSidebar] = useState(false)
   const [assignedMentors, setAssignedMentors] = useState([
-    { id: 1, name: "John Smith", role: "Senior VP", expertise: ["Leadership", "Strategy"], matchScore: 95 },
-    { id: 2, name: "Jennifer Lee", role: "Principal Engineer", expertise: ["Tech", "Career Growth"], matchScore: 88 },
+    { 
+      id: 1, 
+      name: "John Smith", 
+      title: "Senior VP of Product", 
+      expertise: ["Leadership", "Strategy"],
+      location: "North America",
+      languages: ["English", "French"],
+      matchScore: 95 
+    },
+    { 
+      id: 2, 
+      name: "Jennifer Lee", 
+      title: "Principal Engineer", 
+      expertise: ["Tech", "Career Growth"],
+      location: "Asia Pacific",
+      languages: ["English", "Korean", "Mandarin"],
+      matchScore: 88 
+    },
   ])
 
   useEffect(() => {
@@ -24,31 +40,33 @@ export default function MenteeDashboardPage() {
     setAssignedMentors(assignedMentors.filter((m) => m.id !== id))
   }
 
-  // Dummy data
   const suggestedMentors = [
     {
       id: 3,
       name: "Michael Brown",
-      role: "Director of Operations",
+      title: "Director of Operations",
       expertise: ["Operations", "Management"],
-      matchScore: 85,
-      rating: 4.9,
+      location: "Europe",
+      languages: ["English", "Spanish"],
+      matchScore: 85
     },
     {
       id: 4,
       name: "Lisa Garcia",
-      role: "Product Lead",
+      title: "Product Lead",
       expertise: ["Product", "Strategy"],
-      matchScore: 82,
-      rating: 4.7,
+      location: "North America",
+      languages: ["English", "Spanish", "Portuguese"],
+      matchScore: 82
     },
     {
       id: 5,
       name: "David Kumar",
-      role: "Tech Lead",
+      title: "Tech Lead",
       expertise: ["Engineering", "Architecture"],
-      matchScore: 79,
-      rating: 4.8,
+      location: "Asia Pacific",
+      languages: ["English", "Hindi"],
+      matchScore: 79
     },
   ]
 
@@ -91,20 +109,19 @@ export default function MenteeDashboardPage() {
                 whileHover={{ y: -4 }}
                 className="p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h3 className="font-serif text-xl font-bold">{mentor.name}</h3>
-                    <p className="text-sm text-muted-foreground">{mentor.role}</p>
+                <div className="mb-4">
+                  <h3 className="font-serif text-xl font-bold">{mentor.name}</h3>
+                  <p className="text-sm text-muted-foreground mb-3">{mentor.title}</p>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4" />
+                      <span>{mentor.location}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Languages className="w-4 h-4" />
+                      <span>{mentor.languages.join(", ")}</span>
+                    </div>
                   </div>
-                  <motion.button
-                    onClick={() => removeMentor(mentor.id)}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="p-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-all"
-                    title="Remove mentor"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </motion.button>
                 </div>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {mentor.expertise.map((exp) => (
@@ -113,7 +130,11 @@ export default function MenteeDashboardPage() {
                     </span>
                   ))}
                 </div>
-                <div className="w-full bg-border rounded-full h-2 mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-muted-foreground">Match Score</span>
+                  <span className="text-sm font-semibold text-primary">{mentor.matchScore}%</span>
+                </div>
+                <div className="w-full bg-border rounded-full h-2">
                   <motion.div
                     className="bg-gradient-to-r from-primary to-accent h-2 rounded-full"
                     initial={{ width: 0 }}
@@ -151,18 +172,17 @@ export default function MenteeDashboardPage() {
               >
                 <div className="mb-4">
                   <h3 className="font-serif font-bold text-lg">{mentor.name}</h3>
-                  <p className="text-sm text-muted-foreground">{mentor.role}</p>
-                </div>
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-4 h-4 ${
-                        i < Math.floor(mentor.rating) ? "fill-secondary text-secondary" : "text-border"
-                      }`}
-                    />
-                  ))}
-                  <span className="text-xs text-muted-foreground ml-1">{mentor.rating}</span>
+                  <p className="text-sm text-muted-foreground mb-3">{mentor.title}</p>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4" />
+                      <span>{mentor.location}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Languages className="w-4 h-4" />
+                    <span>{mentor.languages.join(", ")}</span>
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {mentor.expertise.map((exp) => (
@@ -170,6 +190,18 @@ export default function MenteeDashboardPage() {
                       {exp}
                     </span>
                   ))}
+                </div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-muted-foreground">Match Score</span>
+                  <span className="text-sm font-semibold text-primary">{mentor.matchScore}%</span>
+                </div>
+                <div className="w-full bg-border rounded-full h-2 mb-4">
+                  <motion.div
+                    className="bg-gradient-to-r from-primary to-accent h-2 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${mentor.matchScore}%` }}
+                    transition={{ duration: 1 }}
+                  />
                 </div>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
