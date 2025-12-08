@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Users, Check, X, Target, MapPin, Languages } from "lucide-react"
+import { Users, Check, X, Target, MapPin, Languages, Trash2 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -10,8 +10,7 @@ import { TopBar } from "@/components/top-bar"
 
 export default function MentorDashboardPage() {
   const [isHydrated, setIsHydrated] = useState(false)
-
-  const activeMentees = [
+  const [activeMentees, setActiveMentees] = useState([
     { 
       id: 1, 
       name: "Sarah Johnson", 
@@ -39,7 +38,7 @@ export default function MentorDashboardPage() {
       languages: ["English", "Portuguese"],
       joinDate: "3 weeks ago"
     },
-  ]
+  ])
 
   const pendingMentees = [
     { 
@@ -65,6 +64,10 @@ export default function MentorDashboardPage() {
   useEffect(() => {
     setIsHydrated(true)
   }, [])
+
+  const removeMentee = (id: number) => {
+    setActiveMentees(activeMentees.filter((m) => m.id !== id))
+  }
 
   const fadeUp = {
     hidden: { opacity: 0, y: 20 },
@@ -148,28 +151,41 @@ export default function MentorDashboardPage() {
                       whileHover={{ scale: 1.01 }}
                       className="p-5 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors border border-accent/20"
                     >
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-lg text-foreground">{mentee.name}</h3>
-                        <Badge className="bg-accent/20 text-accent-foreground border-accent/30">
-                          Active
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-2">{mentee.title}</p>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                        <Target className="w-4 h-4" />
-                        <span>{mentee.goals}</span>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
-                        <div className="flex items-center gap-1">
-                          <MapPin className="w-4 h-4" />
-                          <span>{mentee.region}</span>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-lg text-foreground">{mentee.name}</h3>
+                            <Badge className="bg-accent/20 text-accent-foreground border-accent/30">
+                              Active
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-2">{mentee.title}</p>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                            <Target className="w-4 h-4" />
+                            <span>{mentee.goals}</span>
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
+                            <div className="flex items-center gap-1">
+                              <MapPin className="w-4 h-4" />
+                              <span>{mentee.region}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Languages className="w-4 h-4" />
+                              <span>{mentee.languages.join(", ")}</span>
+                            </div>
+                          </div>
+                          <p className="text-xs text-muted-foreground/70 mt-2">Joined {mentee.joinDate}</p>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Languages className="w-4 h-4" />
-                          <span>{mentee.languages.join(", ")}</span>
-                        </div>
+                        <motion.button
+                          onClick={() => removeMentee(mentee.id)}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="p-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-all"
+                          title="Remove mentee"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </motion.button>
                       </div>
-                      <p className="text-xs text-muted-foreground/70 mt-2">Joined {mentee.joinDate}</p>
                     </motion.div>
                   ))}
                 </div>

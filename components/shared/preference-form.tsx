@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { FormInput } from "./form-input"
-import { FormMultiSelect } from "./form-multi-select"
-import { useState, useEffect } from "react"
+import { motion } from "framer-motion";
+import { FormInput } from "./form-input";
+import { FormMultiSelect } from "./form-multi-select";
+import { useState, useEffect } from "react";
 
 interface PreferenceFormProps {
-  role: "mentor" | "mentee"
-  onSave?: (data: any) => void
+  role: "mentor" | "mentee";
+  onSave?: (data: any) => void;
 }
 
 const multiSelectOptions = {
@@ -50,7 +50,7 @@ const multiSelectOptions = {
     { value: "technical-skills", label: "Technical Skills" },
     { value: "work-life-balance", label: "Work-Life Balance" },
   ],
-}
+};
 
 export function PreferenceForm({ role, onSave }: PreferenceFormProps) {
   const [formData, setFormData] = useState({
@@ -62,24 +62,24 @@ export function PreferenceForm({ role, onSave }: PreferenceFormProps) {
     learningGoals: [] as string[],
     maxMentees: "5",
     bio: "",
-  })
+  });
 
   useEffect(() => {
-    const savedPreferences = localStorage.getItem(`${role}Preferences`)
+    const savedPreferences = localStorage.getItem(`${role}Preferences`);
     if (savedPreferences) {
       try {
-        const parsed = JSON.parse(savedPreferences)
-        setFormData(parsed)
+        const parsed = JSON.parse(savedPreferences);
+        setFormData(parsed);
       } catch (e) {
-        console.error("Error parsing saved preferences:", e)
+        console.error("Error parsing saved preferences:", e);
       }
     }
-  }, [role])
+  }, [role]);
 
   const handleSave = () => {
-    localStorage.setItem(`${role}Preferences`, JSON.stringify(formData))
-    onSave?.(formData)
-  }
+    localStorage.setItem(`${role}Preferences`, JSON.stringify(formData));
+    onSave?.(formData);
+  };
 
   return (
     <motion.div
@@ -121,7 +121,9 @@ export function PreferenceForm({ role, onSave }: PreferenceFormProps) {
             label="Max Mentees"
             type="number"
             value={formData.maxMentees}
-            onChange={(value) => setFormData({ ...formData, maxMentees: value })}
+            onChange={(value) =>
+              setFormData({ ...formData, maxMentees: value })
+            }
             min={1}
             max={10}
           />
@@ -132,7 +134,9 @@ export function PreferenceForm({ role, onSave }: PreferenceFormProps) {
             label="Learning Goals"
             options={multiSelectOptions.learningGoals}
             selected={formData.learningGoals}
-            onChange={(learningGoals) => setFormData({ ...formData, learningGoals })}
+            onChange={(learningGoals) =>
+              setFormData({ ...formData, learningGoals })
+            }
           />
 
           <FormMultiSelect
@@ -152,7 +156,9 @@ export function PreferenceForm({ role, onSave }: PreferenceFormProps) {
       />
 
       <div className="mb-6">
-        <label className="block text-sm font-semibold mb-3 text-foreground">Bio</label>
+        <label className="block text-sm font-semibold mb-3 text-foreground">
+          Bio
+        </label>
         <textarea
           value={formData.bio}
           onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
@@ -166,10 +172,10 @@ export function PreferenceForm({ role, onSave }: PreferenceFormProps) {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={handleSave}
-        className="w-full px-4 py-3 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-lg font-semibold hover:shadow-lg transition-all"
+        className="w-full px-4 py-3 bg-linear-to-r from-primary to-accent text-primary-foreground rounded-lg font-semibold hover:shadow-lg transition-all"
       >
         Save Preferences
       </motion.button>
     </motion.div>
-  )
+  );
 }

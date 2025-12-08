@@ -200,7 +200,7 @@ export default function MatchesPage() {
                 key={mentor.id}
                 variants={itemVariants}
                 whileHover="hoverY"
-                className="p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all cursor-pointer group"
+                className="p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all cursor-pointer group flex flex-col"
               >
                 <div className="mb-4">
                   <div className="flex items-start justify-between mb-3">
@@ -235,7 +235,7 @@ export default function MatchesPage() {
                   ))}
                 </div>
 
-                <div className="mb-4">
+                <div className="mb-4 mt-auto">
                   <div className="w-full bg-border rounded-full h-2">
                     <motion.div
                       className="bg-gradient-to-r from-primary to-accent h-2 rounded-full"

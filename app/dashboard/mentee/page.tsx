@@ -200,7 +200,7 @@ export default function MenteeDashboardPage() {
                 key={mentor.id}
                 variants={itemVariants}
                 whileHover={{ y: -4 }}
-                className="p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all cursor-pointer"
+                className="p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all cursor-pointer flex flex-col"
               >
                 <div className="mb-4">
                   <h3 className="font-serif font-bold text-lg">{mentor.name}</h3>
@@ -223,7 +223,7 @@ export default function MenteeDashboardPage() {
                     </span>
                   ))}
                 </div>
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-2 mt-auto">
                   <span className="text-sm text-muted-foreground">Match Score</span>
                   <span className="text-sm font-semibold text-primary">{mentor.matchScore}%</span>
                 </div>
