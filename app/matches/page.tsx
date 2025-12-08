@@ -16,7 +16,6 @@ import { useRole } from '@/hooks/useRole'
 import { useRouter } from 'next/navigation'
 
 export default function MatchesPage() {
-  const [selectedFilter, setSelectedFilter] = useState<string>('')
   const [mentors, setMentors] = useState<any[]>([])
   const [page, setPage] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
@@ -169,8 +168,6 @@ export default function MatchesPage() {
     )
   }
 
-  const filters = ['All', 'Product', 'Technology', 'Operations', 'Leadership']
-
   return (
     <div className="min-h-screen bg-background">
       <TopBar />
@@ -186,7 +183,7 @@ export default function MatchesPage() {
             <p className="text-lg text-muted-foreground">Find the perfect mentor for your growth</p>
           </motion.div>
 
-          <motion.div variants={itemVariants} className="mb-8 space-y-4">
+          <motion.div variants={itemVariants} className="mb-8">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
@@ -194,24 +191,6 @@ export default function MatchesPage() {
                 placeholder="Search mentors by name or expertise..."
                 className="w-full pl-12 pr-4 py-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground"
               />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {filters.map((filter) => (
-                <motion.button
-                  key={filter}
-                  variants={scale}
-                  whileHover="hover"
-                  whileTap="tap"
-                  onClick={() => setSelectedFilter(filter)}
-                  className={`px-4 py-2 rounded-full transition-all ${
-                    selectedFilter === filter || (!selectedFilter && filter === 'All')
-                      ? 'bg-primary text-primary-foreground'
-                      : 'border border-border bg-card text-foreground hover:border-primary/50'
-                  }`}
-                >
-                  {filter}
-                </motion.button>
-              ))}
             </div>
           </motion.div>
 
