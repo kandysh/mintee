@@ -101,50 +101,71 @@ export default function MenteeDashboardPage() {
         {/* Assigned Mentors */}
         <motion.div variants={itemVariants} className="mb-12">
           <h2 className="text-3xl font-serif font-bold mb-6">Your Mentors</h2>
-          <motion.div className="grid md:grid-cols-2 gap-6" variants={containerVariants}>
-            {assignedMentors.map((mentor) => (
-              <motion.div
-                key={mentor.id}
-                variants={itemVariants}
-                whileHover={{ y: -4 }}
-                className="p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all"
-              >
-                <div className="mb-4">
-                  <h3 className="font-serif text-xl font-bold">{mentor.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">{mentor.title}</p>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4" />
-                      <span>{mentor.location}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Languages className="w-4 h-4" />
-                      <span>{mentor.languages.join(", ")}</span>
+          {assignedMentors.length === 0 ? (
+            <div className="text-center py-16 px-4">
+              <div className="inline-block p-4 rounded-full bg-muted/50 mb-4">
+                <Search className="w-12 h-12 text-muted-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">No mentors yet</h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                You haven't connected with any mentors yet. Explore our mentor matches below to find the perfect guide for your journey.
+              </p>
+              <Link href="/matches">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-6 py-3 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-lg font-semibold hover:shadow-lg transition-all"
+                >
+                  Find Mentors
+                </motion.button>
+              </Link>
+            </div>
+          ) : (
+            <motion.div className="grid md:grid-cols-2 gap-6" variants={containerVariants}>
+              {assignedMentors.map((mentor) => (
+                <motion.div
+                  key={mentor.id}
+                  variants={itemVariants}
+                  whileHover={{ y: -4 }}
+                  className="p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all"
+                >
+                  <div className="mb-4">
+                    <h3 className="font-serif text-xl font-bold">{mentor.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-3">{mentor.title}</p>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        <span>{mentor.location}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Languages className="w-4 h-4" />
+                        <span>{mentor.languages.join(", ")}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {mentor.expertise.map((exp) => (
-                    <span key={exp} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
-                      {exp}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-muted-foreground">Match Score</span>
-                  <span className="text-sm font-semibold text-primary">{mentor.matchScore}%</span>
-                </div>
-                <div className="w-full bg-border rounded-full h-2">
-                  <motion.div
-                    className="bg-gradient-to-r from-primary to-accent h-2 rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${mentor.matchScore}%` }}
-                    transition={{ duration: 1 }}
-                  />
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {mentor.expertise.map((exp) => (
+                      <span key={exp} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
+                        {exp}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-muted-foreground">Match Score</span>
+                    <span className="text-sm font-semibold text-primary">{mentor.matchScore}%</span>
+                  </div>
+                  <div className="w-full bg-border rounded-full h-2">
+                    <motion.div
+                      className="bg-gradient-to-r from-primary to-accent h-2 rounded-full"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${mentor.matchScore}%` }}
+                      transition={{ duration: 1 }}
+                    />
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Suggested Mentors */}
