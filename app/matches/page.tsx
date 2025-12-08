@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Search, Star } from 'lucide-react'
+import { Search, MapPin, Languages } from 'lucide-react'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import {
     containerVariants,
@@ -35,55 +35,55 @@ export default function MatchesPage() {
     {
       id: 1,
       name: 'James Wilson',
-      role: 'VP Product Strategy',
+      title: 'VP Product Strategy',
       expertise: ['Product', 'Strategy', 'Leadership'],
-      regions: ['North America'],
-      rating: 4.9,
+      location: 'North America',
+      languages: ['English', 'Spanish'],
       matchScore: 92,
     },
     {
       id: 2,
       name: 'Sarah Mitchell',
-      role: 'Chief Technology Officer',
+      title: 'Chief Technology Officer',
       expertise: ['Technology', 'Engineering', 'Innovation'],
-      regions: ['Europe'],
-      rating: 4.8,
+      location: 'Europe',
+      languages: ['English', 'German'],
       matchScore: 88,
     },
     {
       id: 3,
       name: 'Robert Chen',
-      role: 'Director of Operations',
+      title: 'Director of Operations',
       expertise: ['Operations', 'Process', 'Analytics'],
-      regions: ['Asia Pacific'],
-      rating: 4.7,
+      location: 'Asia Pacific',
+      languages: ['English', 'Mandarin'],
       matchScore: 85,
     },
     {
       id: 4,
       name: 'Emma Rodriguez',
-      role: 'Head of People',
+      title: 'Head of People',
       expertise: ['HR', 'Talent', 'Culture'],
-      regions: ['North America'],
-      rating: 4.9,
+      location: 'North America',
+      languages: ['English', 'Spanish', 'Portuguese'],
       matchScore: 83,
     },
     {
       id: 5,
       name: 'Michael Thompson',
-      role: 'Finance Director',
+      title: 'Finance Director',
       expertise: ['Finance', 'FP&A', 'Business'],
-      regions: ['Europe'],
-      rating: 4.6,
+      location: 'Europe',
+      languages: ['English', 'French'],
       matchScore: 81,
     },
     {
       id: 6,
       name: 'Lisa Kumar',
-      role: 'Marketing Leader',
+      title: 'Marketing Leader',
       expertise: ['Marketing', 'Brand', 'Digital'],
-      regions: ['Asia Pacific'],
-      rating: 4.8,
+      location: 'Asia Pacific',
+      languages: ['English', 'Hindi', 'Mandarin'],
       matchScore: 79,
     },
   ]
@@ -97,28 +97,28 @@ export default function MatchesPage() {
         {
           id: 6 + page * 3,
           name: `Mentor ${6 + page * 3}`,
-          role: 'Senior Leader',
+          title: 'Senior Leader',
           expertise: ['Strategy', 'Leadership'],
-          regions: ['Remote'],
-          rating: 4.7 + Math.random() * 0.3,
+          location: 'Remote',
+          languages: ['English'],
           matchScore: 75 + Math.random() * 20,
         },
         {
           id: 7 + page * 3,
           name: `Mentor ${7 + page * 3}`,
-          role: 'Industry Expert',
+          title: 'Industry Expert',
           expertise: ['Technology', 'Innovation'],
-          regions: ['Global'],
-          rating: 4.6 + Math.random() * 0.4,
+          location: 'Global',
+          languages: ['English', 'Spanish'],
           matchScore: 70 + Math.random() * 25,
         },
         {
           id: 8 + page * 3,
           name: `Mentor ${8 + page * 3}`,
-          role: 'Executive Coach',
+          title: 'Executive Coach',
           expertise: ['Leadership', 'Growth'],
-          regions: ['Multiple'],
-          rating: 4.8 + Math.random() * 0.2,
+          location: 'Multiple',
+          languages: ['English', 'French'],
           matchScore: 80 + Math.random() * 15,
         },
       ]
@@ -225,29 +225,23 @@ export default function MatchesPage() {
               >
                 <div className="mb-4">
                   <div className="flex items-start justify-between mb-3">
-                    <div>
+                    <div className="flex-1">
                       <h3 className="font-serif font-bold text-lg">{mentor.name}</h3>
-                      <p className="text-sm text-muted-foreground">{mentor.role}</p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded">
-                        {Math.round(mentor.matchScore)}% match
+                      <p className="text-sm text-muted-foreground mb-3">{mentor.title}</p>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
+                        <div className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          <span>{mentor.location}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Languages className="w-4 h-4" />
+                        <span>{mentor.languages.join(', ')}</span>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-4 h-4 ${
-                          i < Math.floor(mentor.rating)
-                            ? 'fill-secondary text-secondary'
-                            : 'text-border'
-                        }`}
-                      />
-                    ))}
-                    <span className="text-xs text-muted-foreground ml-1">{mentor.rating.toFixed(1)}</span>
+                    <div className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded h-fit">
+                      {Math.round(mentor.matchScore)}% match
+                    </div>
                   </div>
                 </div>
 
