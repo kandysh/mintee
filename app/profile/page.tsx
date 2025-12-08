@@ -8,6 +8,7 @@ import { useRole } from '@/hooks/useRole'
 import { rotate, containerVariants, itemVariants } from '@/lib/animations'
 import { FormInput } from '@/components/shared/form-input'
 import { FormMultiSelect } from '@/components/shared/form-multi-select'
+import { FormSelect } from '@/components/shared/form-select'
 
 const gcbLevels = [
   { value: 'gcb1', label: 'GCB 1' },
@@ -161,59 +162,29 @@ export default function ProfilePage() {
               placeholder="e.g., Senior Vice President, Product Manager"
             />
 
-            <div>
-              <label className="block text-sm font-semibold mb-3 text-foreground">
-                GCB Level
-              </label>
-              <select
-                value={formData.gcbLevel}
-                onChange={(e) => setFormData({ ...formData, gcbLevel: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-              >
-                <option value="">Select GCB Level</option>
-                {gcbLevels.map((level) => (
-                  <option key={level.value} value={level.value}>
-                    {level.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <FormSelect
+              label="GCB Level"
+              placeholder="Select GCB Level"
+              options={gcbLevels}
+              value={formData.gcbLevel}
+              onChange={(value) => setFormData({ ...formData, gcbLevel: value })}
+            />
 
-            <div>
-              <label className="block text-sm font-semibold mb-3 text-foreground">
-                GC Tenure
-              </label>
-              <select
-                value={formData.gcTenure}
-                onChange={(e) => setFormData({ ...formData, gcTenure: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-              >
-                <option value="">Select Tenure</option>
-                {gcTenure.map((tenure) => (
-                  <option key={tenure.value} value={tenure.value}>
-                    {tenure.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <FormSelect
+              label="GC Tenure"
+              placeholder="Select Tenure"
+              options={gcTenure}
+              value={formData.gcTenure}
+              onChange={(value) => setFormData({ ...formData, gcTenure: value })}
+            />
 
-            <div>
-              <label className="block text-sm font-semibold mb-3 text-foreground">
-                Location
-              </label>
-              <select
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-              >
-                <option value="">Select Location</option>
-                {locations.map((loc) => (
-                  <option key={loc.value} value={loc.value}>
-                    {loc.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <FormSelect
+              label="Location"
+              placeholder="Select Location"
+              options={locations}
+              value={formData.location}
+              onChange={(value) => setFormData({ ...formData, location: value })}
+            />
 
             <FormMultiSelect
               label="Languages"
@@ -246,23 +217,13 @@ export default function ProfilePage() {
               onChange={(selected) => setFormData({ ...formData, additionalExperiences: selected })}
             />
 
-            <div>
-              <label className="block text-sm font-semibold mb-3 text-foreground">
-                Business Area
-              </label>
-              <select
-                value={formData.businessArea}
-                onChange={(e) => setFormData({ ...formData, businessArea: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-              >
-                <option value="">Select Business Area</option>
-                {businessAreas.map((area) => (
-                  <option key={area.value} value={area.value}>
-                    {area.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <FormSelect
+              label="Business Area"
+              placeholder="Select Business Area"
+              options={businessAreas}
+              value={formData.businessArea}
+              onChange={(value) => setFormData({ ...formData, businessArea: value })}
+            />
 
             <motion.button
               whileHover={{ scale: 1.02 }}
