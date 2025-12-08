@@ -11,12 +11,14 @@ RETURNS TABLE (
     job_capability_score NUMERIC,
     leadership_overlap INT,
     additional_experiences TEXT,
-    leadership_experiences TEXT
+    leadership_experiences TEXT,
+    mle_names TEXT[],
+    mae_names TEXT[]
 )
 LANGUAGE sql
 AS $$
 WITH mentee AS (
-    SELECT 
+    SELECT
         u.id AS user_id,
         u.languages,
         u.gcb_level,
@@ -31,7 +33,7 @@ WITH mentee AS (
     JOIN users u ON u.id = mp.id
     WHERE mp.id = p_mentee_id
 )
-SELECT 
+SELECT
     mp.id AS mentor_id,
     mu.id AS mentor_user_id,
 
@@ -39,7 +41,7 @@ SELECT
         -- 1. Language fuzzy match
         10 * (
             SELECT COALESCE(
-                MAX(similarity(ml, ANY(mentee.languages))), 
+                MAX(similarity(ml, ANY(mentee.languages))),
             0)
             FROM unnest(mu.languages) ml
         )
@@ -78,14 +80,14 @@ SELECT
     -- Debug values for tuning
     (
         SELECT COALESCE(
-            MAX(similarity(ml, ANY(mentee.languages))), 
+            MAX(similarity(ml, ANY(mentee.languages))),
         0)
         FROM unnest(mu.languages) ml
     ) AS lang_score,
 
     (
         SELECT COALESCE(
-            MAX(similarity(ae.name, ANY(mentee.learning_goals))), 
+            MAX(similarity(ae.name, ANY(mentee.learning_goals))),
         0)
         FROM mentor_additional_experiences mae
         JOIN additional_experience ae ON ae.id = mae.additional_experience_id
@@ -94,7 +96,7 @@ SELECT
 
     (
         SELECT COALESCE(
-            MAX(similarity(le.name, ANY(mentee.job_capabilities))), 
+            MAX(similarity(le.name, ANY(mentee.job_capabilities))),
         0)
         FROM mentor_leadership_experiences mle
         JOIN leadership_experience le ON le.id = mle.leadership_experience_id
@@ -114,7 +116,23 @@ SELECT
     mp.additional_experiences AS additional_experiences,
 
     -- Leadership experiences from mentor profile
-    mp.leadership_experiences AS leadership_experiences
+    mp.leadership_experiences AS leadership_experiences,
+
+    -- MLE: Aggregated leadership experience names for the mentor
+    (
+        SELECT ARRAY_AGG(le.name ORDER BY le.name)
+        FROM mentor_leadership_experiences mle
+        JOIN leadership_experience le ON le.id = mle.leadership_experience_id
+        WHERE mle.mentor_id = mp.id
+    ) AS mle_names,
+
+    -- MAE: Aggregated additional experience names for the mentor
+    (
+        SELECT ARRAY_AGG(ae.name ORDER BY ae.name)
+        FROM mentor_additional_experiences mae
+        JOIN additional_experience ae ON ae.id = mae.additional_experience_id
+        WHERE mae.mentor_id = mp.id
+    ) AS mae_names
 
 FROM mentor_profile mp
 JOIN users mu ON mu.id = mp.id
@@ -134,7 +152,7 @@ AND (
 )
 
 AND (
-    CASE 
+    CASE
         WHEN mentee.gcb_tenure <= 2 THEN mu.gcb_tenure >= 3
         ELSE TRUE
     END
