@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Search, MapPin, Languages } from "lucide-react"
+import { Search, MapPin, Languages, X } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { PreferenceForm } from "@/components/shared/preference-form"
@@ -129,19 +129,30 @@ export default function MenteeDashboardPage() {
                   whileHover={{ y: -4 }}
                   className="p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all"
                 >
-                  <div className="mb-4">
-                    <h3 className="font-serif text-xl font-bold">{mentor.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-3">{mentor.title}</p>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        <span>{mentor.location}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Languages className="w-4 h-4" />
-                        <span>{mentor.languages.join(", ")}</span>
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="font-serif text-xl font-bold">{mentor.name}</h3>
+                      <p className="text-sm text-muted-foreground mb-3">{mentor.title}</p>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
+                        <div className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          <span>{mentor.location}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Languages className="w-4 h-4" />
+                          <span>{mentor.languages.join(", ")}</span>
+                        </div>
                       </div>
                     </div>
+                    <motion.button
+                      onClick={() => removeMentor(mentor.id)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="p-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-all"
+                      title="Remove mentor"
+                    >
+                      <X className="w-5 h-5" />
+                    </motion.button>
                   </div>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {mentor.expertise.map((exp) => (
