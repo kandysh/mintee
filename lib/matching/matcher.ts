@@ -366,16 +366,31 @@ export class MentorshipMatcher {
       reasons.push(`${totalMatchedExp} shared experiences`);
     }
 
+    // Build frontend-friendly result
+    const mentorTitle = profile?.bio ? profile.bio.split('\n')[0] : 'Mentor';
+    const expertise = [
+      ...experiences.additional,
+      ...experiences.leadership,
+    ].slice(0, 3); // Top 3 experiences
+
+    const finalScore = Math.round(totalScore);
+
     return {
+      // Frontend fields
+      id: mentor.id,
+      name: mentor.name,
+      title: mentorTitle,
+      expertise,
+      location: mentor.location || 'Remote',
+      languages: mentor.languages || [],
+      matchScore: finalScore,
+
+      // Metadata for backend
       mentorId: mentor.id,
-      mentor: {
-        name: mentor.name,
-        location: mentor.location || '',
-        gcbLevel: mentor.gcbLevel || 0,
-        languages: mentor.languages || [],
-        businessAreaId: mentor.businessAreaId || null,
-      },
-      matchScore: Math.round(totalScore),
+      gcbLevel: mentor.gcbLevel || 0,
+      businessAreaId: mentor.businessAreaId || null,
+
+      // Detailed scoring (optional, for advanced views)
       breakdown,
       matchedItems: {
         languages: matchedLanguages,

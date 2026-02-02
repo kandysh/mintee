@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { MatchResult, MatchingFilters } from '@/lib/matching/types';
 
 interface UseMatchingOptions {
@@ -86,9 +86,11 @@ export function useMatching(options: UseMatchingOptions = {}) {
   );
 
   // Auto-fetch on mount if enabled
-  if (autoFetch && menteeId && !state.loading && state.matches.length === 0) {
-    fetchMatches(menteeId);
-  }
+  useEffect(() => {
+    if (autoFetch && menteeId && !state.loading && state.matches.length === 0) {
+      fetchMatches(menteeId);
+    }
+  }, [autoFetch, menteeId, state.loading, state.matches.length, fetchMatches]);
 
   return {
     ...state,
