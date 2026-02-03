@@ -31,10 +31,7 @@ export class MentorshipMatcher {
     const mentee = await this.getMenteeWithProfile(menteeId);
     if (!mentee) throw new Error('Mentee not found');
 
-    // 2. Build WHERE conditions leveraging GIN indexes
-    const whereConditions = this.buildWhereConditions(mentee, filters);
-
-    // 3. Fetch potential mentors with GIN-optimized query
+    // 2. Fetch potential mentors with basic filters
     const candidates = await db
       .select({
         user: users,
@@ -42,16 +39,55 @@ export class MentorshipMatcher {
       })
       .from(users)
       .innerJoin(mentorProfile, eq(users.id, mentorProfile.userId))
-      .where(and(...whereConditions))
-      .limit(limit * 3); // Get more candidates for scoring
+      .where(
+        and(
+          ne(users.id, mentee.id),
+          or(eq(users.role, 'MENTOR'), eq(users.role, 'BOTH')),
+          eq(mentorProfile.active, true),
+          sql`${users.gcbLevel} >= ${mentee.gcbLevel}`,
+          or(
+            isNull(mentorProfile.maxMentees),
+            sql`${mentorProfile.currentMentees} < ${mentorProfile.maxMentees}`
+          )
+        )
+      )
+      .limit(limit * 5); // Get more candidates for filtering and scoring
 
-    // 4. Fetch experiences for all candidates in batch
-    const candidateIds = candidates.map((c) => c.user.id);
+    // 3. Filter by language overlap in JavaScript (uses GIN index on read)
+    const menteeLanguages: string[] = Array.isArray(mentee.languages)
+      ? mentee.languages
+      : [];
+    const filteredCandidates = candidates.filter(({ user }) => {
+      if (menteeLanguages.length === 0) return true;
+      const userLanguages: string[] = Array.isArray(user.languages)
+        ? user.languages
+        : [];
+      return menteeLanguages.some((lang: string) =>
+        userLanguages.includes(lang)
+      );
+    });
+
+    // 4. Apply location and business area filters
+    const finalCandidates = filteredCandidates.filter(({ user }) => {
+      if (filters.respectSameLocation && mentee.menteeProfile?.sameLocation) {
+        if (user.location !== mentee.location) return false;
+      }
+      if (
+        filters.respectSameBusinessArea &&
+        mentee.menteeProfile?.sameBusinessArea
+      ) {
+        if (user.businessAreaId !== mentee.businessAreaId) return false;
+      }
+      return true;
+    });
+
+    // 5. Fetch experiences for all candidates in batch
+    const candidateIds = finalCandidates.map((c) => String(c.user.id));
     const candidatesWithExperiences =
       await this.enrichWithExperiences(candidateIds);
 
-    // 5. Score each candidate
-    const scoredMatches = candidates.map(({ user, profile }) => {
+    // 6. Score each candidate
+    const scoredMatches = finalCandidates.map(({ user, profile }) => {
       const experiences = candidatesWithExperiences[user.id.toString()] || {
         additional: [],
         leadership: [],
@@ -60,55 +96,13 @@ export class MentorshipMatcher {
       return this.scoreMatch(mentee, user, profile, experiences, filters);
     });
 
-    // 6. Filter and sort
+    // 7. Filter and sort
     return scoredMatches
       .filter((match) => match.matchScore > 0)
       .sort((a, b) => b.matchScore - a.matchScore)
       .slice(0, limit);
   }
 
-  /**
-   * Build WHERE conditions using GIN indexes for array operations
-   */
-  private buildWhereConditions(
-    mentee: MenteeWithProfile,
-    filters: MatchingFilters
-  ) {
-    const conditions = [
-      // Basic filters
-      ne(users.id, mentee.id),
-      or(eq(users.role, 'MENTOR'), eq(users.role, 'BOTH')),
-      eq(mentorProfile.active, true),
-
-      // GIN Index: Language overlap (uses && operator)
-      // This is VERY fast with GIN index
-      sql`${users.languages} && ${JSON.stringify(mentee.languages)}`,
-
-      // Seniority: Mentor should be more senior or equal
-      sql`${users.gcbLevel} >= ${mentee.gcbLevel}`,
-
-      // Capacity check
-      or(
-        isNull(mentorProfile.maxMentees),
-        sql`${mentorProfile.currentMentees} < ${mentorProfile.maxMentees}`
-      ),
-    ];
-
-    // Optional: Same location filter
-    if (filters.respectSameLocation && mentee.menteeProfile?.sameLocation) {
-      conditions.push(eq(users.location, mentee.location));
-    }
-
-    // Optional: Same business area filter
-    if (
-      filters.respectSameBusinessArea &&
-      mentee.menteeProfile?.sameBusinessArea
-    ) {
-      conditions.push(eq(users.businessAreaId, mentee.businessAreaId));
-    }
-
-    return conditions;
-  }
 
   /**
    * Fetch mentee with complete profile
@@ -180,8 +174,11 @@ export class MentorshipMatcher {
   /**
    * Batch fetch experiences for multiple mentors
    */
-  private async enrichWithExperiences(mentorIds: (string | number)[]) {
+  private async enrichWithExperiences(mentorIds: string[]) {
     if (mentorIds.length === 0) return {};
+
+    // Convert string IDs to BigInt for database query
+    const mentorIdsBigInt = mentorIds.map((id) => BigInt(id));
 
     const [additionalExp, leadershipExp] = await Promise.all([
       db
@@ -197,7 +194,7 @@ export class MentorshipMatcher {
             additionalExperience.id
           )
         )
-        .where(inArray(mentorAdditionalExperiences.mentorId, mentorIds as any)),
+        .where(inArray(mentorAdditionalExperiences.mentorId, mentorIdsBigInt)),
 
       db
         .select({
@@ -212,7 +209,7 @@ export class MentorshipMatcher {
             leadershipExperience.id
           )
         )
-        .where(inArray(mentorLeadershipExperiences.mentorId, mentorIds as any)),
+        .where(inArray(mentorLeadershipExperiences.mentorId, mentorIdsBigInt)),
     ]);
 
     // Group by mentor ID
@@ -291,9 +288,13 @@ export class MentorshipMatcher {
     }
 
     // 3. Language overlap
-    const menteeLanguages = mentee.languages || [];
-    const mentorLanguages = mentor.languages || [];
-    const matchedLanguages = menteeLanguages.filter((lang) =>
+    const menteeLanguages: string[] = Array.isArray(mentee.languages)
+      ? (mentee.languages as string[])
+      : [];
+    const mentorLanguages: string[] = Array.isArray(mentor.languages)
+      ? (mentor.languages as string[])
+      : [];
+    const matchedLanguages = menteeLanguages.filter((lang: string) =>
       mentorLanguages.includes(lang)
     );
 
@@ -323,14 +324,16 @@ export class MentorshipMatcher {
     }
 
     // 5. Learning goals match (mentor experiences vs mentee goals)
-    const learningGoals = mentee.menteeProfile?.learningGoals || [];
+    const learningGoals = Array.isArray(mentee.menteeProfile?.learningGoals)
+      ? mentee.menteeProfile.learningGoals
+      : [];
     const mentorAllExperiences = [
       ...experiences.additional,
       ...experiences.leadership,
     ];
 
-    const matchedGoals = learningGoals.filter((goal) =>
-      mentorAllExperiences.some((exp) => this.fuzzyMatch(goal, exp))
+    const matchedGoals = learningGoals.filter((goal: string) =>
+      mentorAllExperiences.some((exp: string) => this.fuzzyMatch(goal, exp))
     );
 
     if (matchedGoals.length > 0 && learningGoals.length > 0) {
@@ -375,18 +378,24 @@ export class MentorshipMatcher {
 
     const finalScore = Math.round(totalScore);
 
+    // Convert bigint ID to string for frontend
+    const mentorIdStr = String(mentor.id);
+    const frontendMentorLanguages = Array.isArray(mentor.languages)
+      ? mentor.languages
+      : [];
+
     return {
       // Frontend fields
-      id: mentor.id,
+      id: mentorIdStr,
       name: mentor.name,
       title: mentorTitle,
       expertise,
       location: mentor.location || 'Remote',
-      languages: mentor.languages || [],
+      languages: frontendMentorLanguages,
       matchScore: finalScore,
 
       // Metadata for backend
-      mentorId: mentor.id,
+      mentorId: mentorIdStr,
       gcbLevel: mentor.gcbLevel || 0,
       businessAreaId: mentor.businessAreaId || null,
 
