@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Blotter — FE Architecture v2</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f5f5f4;
+    --color-background-tertiary: #eeede9;
+    --color-text-primary: #1a1a19;
+    --color-text-secondary: #5a5a57;
+    --color-text-tertiary: #8a8a86;
+    --color-border-primary: rgba(0,0,0,0.4);
+    --color-border-secondary: rgba(0,0,0,0.15);
+    --color-border-tertiary: rgba(0,0,0,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-background-primary: #1c1c1a;
+      --color-background-secondary: #242422;
+      --color-background-tertiary: #2c2c2a;
+      --color-text-primary: #e8e6df;
+      --color-text-secondary: #a0a09a;
+      --color-text-tertiary: #686864;
+      --color-border-primary: rgba(255,255,255,0.4);
+      --color-border-secondary: rgba(255,255,255,0.15);
+      --color-border-tertiary: rgba(255,255,255,0.08);
+    }
+  }
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-background-primary);
+    color: var(--color-text-primary);
+    padding: 24px 16px 40px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 20px;
+    font-family: var(--font-mono);
+  }
+  .arch { display: flex; flex-direction: column; gap: 6px; }
+  .layer {
+    border-radius: 10px;
+    border: 1px solid var(--color-border-secondary);
+    background: var(--color-background-secondary);
+    overflow: hidden;
+  }
+  .layer-header {
+    padding: 9px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid transparent;
+    transition: background .15s;
+  }
+  .layer-header:hover { background: var(--color-background-tertiary); }
+  .layer-header.expanded { border-bottom-color: var(--color-border-tertiary); }
+  .layer-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    min-width: 72px;
+  }
+  .layer-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); flex: 1; }
+  .layer-tag { font-size: 11px; color: var(--color-text-tertiary); font-family: var(--font-mono); }
+  .chevron { font-size: 10px; color: var(--color-text-tertiary); transition: transform .2s; }
+  .chevron.open { transform: rotate(90deg); }
+  .layer-body { display: none; padding: 10px 14px 12px; gap: 8px; flex-wrap: wrap; }
+  .layer-body.open { display: flex; }
+  .chip {
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    border: 1px solid var(--color-border-tertiary);
+    background: var(--color-background-primary);
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .chip:hover { border-color: var(--color-border-secondary); background: var(--color-background-secondary); }
+  .chip.active { border-color: var(--color-border-primary); }
+  .chip-title {
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .chip-sub { color: var(--color-text-secondary); font-size: 11px; margin-top: 2px; }
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+  .b-new  { background: #EAF3DE; color: #3B6D11; }
+  .b-warn { background: #FAEEDA; color: #BA7517; }
+  .b-note { background: #E6F1FB; color: #185FA5; }
+  .b-risk { background: #FCEBEB; color: #A32D2D; }
+  @media (prefers-color-scheme: dark) {
+    .b-new  { background: #173404; color: #C0DD97; }
+    .b-warn { background: #412402; color: #FAC775; }
+    .b-note { background: #042C53; color: #B5D4F4; }
+    .b-risk { background: #501313; color: #F7C1C1; }
+  }
+  .detail-box {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--color-background-tertiary);
+    border-radius: 8px;
+    border: 1px solid var(--color-border-tertiary);
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    display: none;
+  }
+  .detail-box.open { display: block; }
+  .detail-box strong { color: var(--color-text-primary); font-weight: 500; }
+  .detail-box code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: var(--color-background-secondary);
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: var(--color-text-primary);
+  }
+  .flow-line { width: 1px; height: 14px; background: var(--color-border-secondary); margin: 0 auto; }
+  .note {
+    background: var(--color-background-tertiary);
+    border: 1px dashed var(--color-border-secondary);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+  .note strong { color: var(--color-text-primary); }
+  .note code { font-family: var(--font-mono); font-size: 11px; }
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--color-text-tertiary);
+    margin: 4px 0 2px;
+    width: 100%;
+  }
+  .changed {
+    border-color: #3B6D11;
+    position: relative;
+  }
+  @media (prefers-color-scheme: dark) {
+    .changed { border-color: #C0DD97; }
+    .changed::after { background: #173404; color: #C0DD97; }
+  }
+  .changed::after {
+    content: 'updated';
+    position: absolute;
+    top: -8px;
+    right: 8px;
+    font-size: 9px;
+    font-weight: 500;
+    color: #3B6D11;
+    background: #EAF3DE;
+    padding: 1px 5px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+</style>
+</head>
+<body>
+
+<h1>Trading Blotter — Frontend Architecture</h1>
+<p class="subtitle">v2 · Vite · React 19 · TypeScript · Dockview · AG Grid v33</p>
+
+<div class="arch">
+
+  <div class="note">
+    <strong>Stack:</strong> Vite · React 19 · TypeScript · TanStack Router v1 · TanStack Query v5 · Zustand v5 · <strong>Dockview</strong> · AG Grid v33
+  </div>
+
+  <!-- Layer 1 -->
+  <div class="layer">
+    <div class="layer-header" onclick="toggle(this)">
+      <span class="layer-label">Layer 1</span>
+      <span class="layer-title">App entry & routing</span>
+      <span class="layer-tag">TanStack Router v1</span>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="layer-body">
+      <div class="chip" onclick="detail(this,'r1')">
+        <div class="chip-title">Route structure</div>
+        <div class="chip-sub">/workspace/:id · /workspace/new</div>
+      </div>
+      <div class="chip" onclick="detail(this,'r2')">
+        <div class="chip-title">Filter as URL params <span class="badge b-note">shareable</span></div>
+        <div class="chip-sub">Type-safe searchParams via Zod</div>
+      </div>
+      <div class="chip" onclick="detail(this,'r3')">
+        <div class="chip-title">Route loader</div>
+        <div class="chip-sub">Pre-fetch workspace before render</div>
+      </div>
+      <div class="detail-box" id="r1">
+        <strong>Route shape</strong><br>
+        <code>/workspace/:id</code> — loads saved layout by ID<br>
+        <code>/workspace/new</code> — blank canvas, default layout<br><br>
+        TanStack Router's <code>loader</code> runs the workspace fetch before the component mounts. No loading spinner on route change — data arrives with the route.
+      </div>
+      <div class="detail-box" id="r2">
+        <strong>URL as filter source of truth</strong><br>
+        <code>?instrument=AAPL&desk=FX&from=2024-01-01</code><br><br>
+        TanStack Router v1 has first-class <code>validateSearch</code> with Zod — filters are typed, validated, and shareable. On mount, Zustand filterStore initialises from URL params. Filter changes update URL via <code>router.navigate</code> (replaceState, not push — no history spam).
+      </div>
+      <div class="detail-box" id="r3">
+        <strong>Route loader pattern</strong><br>
+        The loader calls <code>queryClient.ensureQueryData(workspaceQuery(id))</code> — TanStack Query handles caching, so navigating back to a workspace is instant if the cache is warm. No waterfall between route and first render.
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-line"></div>
+
+  <!-- Layer 2 -->
+  <div class="layer changed">
+    <div class="layer-header" onclick="toggle(this)">
+      <span class="layer-label">Layer 2</span>
+      <span class="layer-title">Workspace engine</span>
+      <span class="layer-tag">Dockview · Panel Registry</span>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="layer-body">
+      <div class="chip" onclick="detail(this,'d1')">
+        <div class="chip-title">Dockview <span class="badge b-new">replaces Golden Layout</span></div>
+        <div class="chip-sub">Zero deps · React-native API</div>
+      </div>
+      <div class="chip" onclick="detail(this,'d2')">
+        <div class="chip-title">Panel registry <span class="badge b-note">core pattern</span></div>
+        <div class="chip-sub">Type string → React component</div>
+      </div>
+      <div class="chip" onclick="detail(this,'d3')">
+        <div class="chip-title">api.toJSON / fromJSON</div>
+        <div class="chip-sub">Built-in serialization</div>
+      </div>
+      <div class="chip" onclick="detail(this,'d4')">
+        <div class="chip-title">Error boundaries <span class="badge b-warn">per panel</span></div>
+        <div class="chip-sub">Panel crash isolation</div>
+      </div>
+      <div class="detail-box" id="d1">
+        <strong>Why Dockview over Golden Layout</strong><br>
+        Zero runtime dependencies. React-first API — no manual portal management or React root lifecycle handling. TypeScript-native. Active maintenance with frequent releases. Floating panels and popout windows built in.<br><br>
+        Golden Layout's React integration in v2 requires you to manage React portals manually — every panel is rendered into a GL-owned DOM node. Dockview handles this internally, your components just render normally.
+      </div>
+      <div class="detail-box" id="d2">
+        <strong>Panel registry pattern</strong><br>
+        <code>const components = {</code><br>
+        <code>&nbsp; blotter: BlotterPanel,</code><br>
+        <code>&nbsp; chart: ChartPanel,</code><br>
+        <code>&nbsp; 'ai-html': AiHtmlPanel,</code><br>
+        <code>}</code><br><br>
+        Pass to <code>&lt;DockviewReact components={components}/&gt;</code>. Each panel type is self-contained — it knows its own filter subscriptions, data needs, and config shape. Adding a new panel type = one file + one registry entry.
+      </div>
+      <div class="detail-box" id="d3">
+        <strong>Serialization flow</strong><br>
+        Dockview exposes <code>api.toJSON()</code> — returns a plain JSON object representing the full layout. On any layout change event → write to <code>layoutStore.pendingLayout</code>, set <code>isDirty=true</code>.<br><br>
+        Save → POST to BE → <code>isDirty=false</code><br>
+        Reset → fetch saved layout → <code>api.fromJSON(savedLayout)</code>
+      </div>
+      <div class="detail-box" id="d4">
+        <strong>Critical for a trading app</strong><br>
+        Users keep this workspace open all day. One broken AI-generated widget must not take down the whole layout. Wrap every panel render in a React <code>ErrorBoundary</code> — show a fallback tile with a reload button. This is non-negotiable.
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-line"></div>
+
+  <!-- Layer 3 -->
+  <div class="layer changed">
+    <div class="layer-header" onclick="toggle(this)">
+      <span class="layer-label">Layer 3</span>
+      <span class="layer-title">State layer</span>
+      <span class="layer-tag">Zustand v5 · TanStack Query v5</span>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="layer-body">
+      <div class="section-label">Zustand v5 — client state</div>
+      <div class="chip" onclick="detail(this,'s1')">
+        <div class="chip-title">filterStore <span class="badge b-new">useShallow built-in</span></div>
+        <div class="chip-sub">instrument · desk · date · trader</div>
+      </div>
+      <div class="chip" onclick="detail(this,'s2')">
+        <div class="chip-title">layoutStore</div>
+        <div class="chip-sub">pendingLayout · isDirty · reset</div>
+      </div>
+      <div class="chip" onclick="detail(this,'s3')">
+        <div class="chip-title">wsStore <span class="badge b-warn">one connection</span></div>
+        <div class="chip-sub">WS singleton · delta buffer · status</div>
+      </div>
+      <div class="section-label">TanStack Query v5 — server state</div>
+      <div class="chip" onclick="detail(this,'q1')">
+        <div class="chip-title">useWorkspace</div>
+        <div class="chip-sub">fetch + cache saved layout</div>
+      </div>
+      <div class="chip" onclick="detail(this,'q2')">
+        <div class="chip-title">useTrades <span class="badge b-note">initial load only</span></div>
+        <div class="chip-sub">SSRM data source · not live path</div>
+      </div>
+      <div class="chip" onclick="detail(this,'q3')">
+        <div class="chip-title">useSaveLayout</div>
+        <div class="chip-sub">useMutation → POST workspace</div>
+      </div>
+      <div class="detail-box" id="s1">
+        <strong>Zustand v5 change that matters</strong><br>
+        <code>useShallow</code> is now a first-class export. For filter subscriptions in panels use <code>useFilterStore(useShallow(s => ({ inst: s.instrument, desk: s.desk })))</code> — only re-renders when those specific values change. Critical at 20K rows.
+      </div>
+      <div class="detail-box" id="s2">
+        <strong>layoutStore</strong><br>
+        Tracks <code>pendingLayout</code> (unsaved Dockview JSON) and <code>isDirty</code> (drives Save button state). On Dockview's <code>onDidLayoutChange</code> event → update store. Save mutation success → reset <code>isDirty</code>.
+      </div>
+      <div class="detail-box" id="s3">
+        <strong>One WebSocket, not one per panel</strong><br>
+        wsStore owns the single WS connection. All panels read from it — never create panel-level WS connections.<br><br>
+        16ms batch buffer: accumulate deltas for one animation frame, flush to AG Grid via <code>applyServerSideTransaction</code> in one call. Without batching, 50 ticks/sec will saturate renders.<br><br>
+        wsStore also handles: reconnect with exponential backoff, heartbeat ping/pong, stale-data indicator on disconnect.
+      </div>
+      <div class="detail-box" id="q1">
+        <strong>useWorkspace(id)</strong><br>
+        Fetches saved layout JSON. Pre-fetched in route loader so it's cache-warm before component mounts. Result hydrates <code>api.fromJSON()</code> on Dockview ready event.
+      </div>
+      <div class="detail-box" id="q2">
+        <strong>TanStack Query is NOT in the live data path</strong><br>
+        It's request/response — not built for high-frequency WS streams. Use it for the initial AG Grid SSRM data source. After that, live deltas come through wsStore directly to AG Grid's transaction API.
+      </div>
+      <div class="detail-box" id="q3">
+        <strong>useSaveLayout mutation</strong><br>
+        POSTs serialised Dockview JSON to <code>POST /workspaces/:id/layout</code>. On error → toast, keep <code>isDirty=true</code> for retry. On success → invalidate <code>useWorkspace</code> query so it's fresh on next load.
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-line"></div>
+
+  <!-- Layer 4 -->
+  <div class="layer changed">
+    <div class="layer-header" onclick="toggle(this)">
+      <span class="layer-label">Layer 4</span>
+      <span class="layer-title">Panel layer</span>
+      <span class="layer-tag">Registered panel types</span>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="layer-body">
+      <div class="chip" onclick="detail(this,'p1')">
+        <div class="chip-title">BlotterPanel <span class="badge b-note">AG Grid v33</span></div>
+        <div class="chip-sub">SSRM · WS deltas · 20K rows</div>
+      </div>
+      <div class="chip" onclick="detail(this,'p2')">
+        <div class="chip-title">ChartPanel</div>
+        <div class="chip-sub">From your asset library</div>
+      </div>
+      <div class="chip" onclick="detail(this,'p3')">
+        <div class="chip-title">AiHtmlPanel <span class="badge b-risk">sandboxed</span></div>
+        <div class="chip-sub">iframe · srcdoc · no parent access</div>
+      </div>
+      <div class="chip" onclick="detail(this,'p4')">
+        <div class="chip-title">Panel config drawer <span class="badge b-new">new</span></div>
+        <div class="chip-sub">Per-panel settings UI</div>
+      </div>
+      <div class="detail-box" id="p1">
+        <strong>AG Grid v33 — what's changed</strong><br>
+        AG Grid v33 introduced a State API (<code>gridApi.getState()</code> / <code>applyState()</code>) that serialises column state, filter state, and sort state in one call. Use this instead of manually tracking column config — it integrates cleanly with your panel config serialization in Dockview's <code>toJSON</code>.<br><br>
+        Still use SSRM for 20K rows. Client-side mode at that scale + live WS updates will block the main thread.
+      </div>
+      <div class="detail-box" id="p2">
+        <strong>ChartPanel</strong><br>
+        Wrap your existing chart component from the asset library. The panel subscribes to <code>filterStore.instrument</code> and requests OHLCV data through TanStack Query. For real-time chart updates, pipe WS ticks directly — don't go through TQ.
+      </div>
+      <div class="detail-box" id="p3">
+        <strong>Security — non-negotiable</strong><br>
+        <code>&lt;iframe sandbox="allow-scripts" srcdoc={sanitizedHtml}/&gt;</code><br><br>
+        The sandbox blocks: DOM access to parent, localStorage, cookies, navigation, form submission. Never use <code>dangerouslySetInnerHTML</code> for LLM output in a fintech app. Also tell BE: sanitize HTML server-side before storing — don't trust the client to always sandbox correctly.
+      </div>
+      <div class="detail-box" id="p4">
+        <strong>Panel config drawer</strong><br>
+        Each panel type exports a <code>ConfigPanel</code> component — rendered in a slide-out drawer when the user clicks a settings icon in the panel header. Dockview supports custom header actions natively. Config changes update <code>panel.params</code> via Dockview's panel API, which triggers <code>onDidLayoutChange</code> → persisted with the layout.
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-line"></div>
+
+  <!-- Layer 5 -->
+  <div class="layer">
+    <div class="layer-header" onclick="toggle(this)">
+      <span class="layer-label">Layer 5</span>
+      <span class="layer-title">Data layer</span>
+      <span class="layer-tag">WS · HTTP · Contracts</span>
+      <span class="chevron">▶</span>
+    </div>
+    <div class="layer-body">
+      <div class="chip" onclick="detail(this,'dl1')">
+        <div class="chip-title">WsManager <span class="badge b-warn">singleton</span></div>
+        <div class="chip-sub">reconnect · heartbeat · message router</div>
+      </div>
+      <div class="chip" onclick="detail(this,'dl2')">
+        <div class="chip-title">HTTP client</div>
+        <div class="chip-sub">ky · interceptors · auth · retry</div>
+      </div>
+      <div class="chip" onclick="detail(this,'dl3')">
+        <div class="chip-title">BE contracts <span class="badge b-warn">agree in week 1</span></div>
+        <div class="chip-sub">WS delta schema · REST endpoints</div>
+      </div>
+      <div class="detail-box" id="dl1">
+        <strong>WsManager</strong> — singleton created on app mount, held in wsStore.<br><br>
+        Responsibilities: exponential backoff reconnect, heartbeat ping/pong (detect silent disconnects), message type routing to correct store slice, stale data banner when connection drops.<br><br>
+        Send filter subscriptions through same socket so server filters data: <code>{ type: 'SUBSCRIBE', filters: { desk: 'FX' } }</code> — never filter 20K delta messages client-side.
+      </div>
+      <div class="detail-box" id="dl2">
+        <strong>HTTP client</strong><br>
+        Use <code>ky</code> (modern fetch wrapper, smaller than axios, tree-shakeable). Thin wrapper adds auth header injection and 401 redirect. All TanStack Query hooks use this — no raw fetch in components.
+      </div>
+      <div class="detail-box" id="dl3">
+        <strong>Contracts to lock down with BE in week 1:</strong><br>
+        <code>GET /workspaces/:id</code> — load saved layout JSON<br>
+        <code>POST /workspaces/:id/layout</code> — save layout JSON<br>
+        WS delta: <code>{ type: 'TRADE_UPDATE', payload: { id, ...fields } }</code><br>
+        WS delta: <code>{ type: 'TRADE_NEW', payload: { ...trade } }</code><br>
+        WS sub: <code>{ type: 'SUBSCRIBE', filters: {...} }</code><br><br>
+        Changing WS message shape after FE integration starts = a week of wasted work. Lock this first.
+      </div>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top: 4px;">
+    <strong>Folder structure:</strong>
+    <code>src/workspace/</code> Dockview setup ·
+    <code>src/panels/</code> registry + one folder per type ·
+    <code>src/store/</code> Zustand slices ·
+    <code>src/hooks/</code> TanStack Query hooks ·
+    <code>src/services/</code> WsManager + httpClient
+  </div>
+
+</div>
+
+<script>
+  function toggle(h) {
+    const b = h.nextElementSibling, c = h.querySelector('.chevron'), o = b.classList.toggle('open');
+    h.classList.toggle('expanded', o);
+    c.classList.toggle('open', o);
+  }
+  function detail(chip, id) {
+    const box = document.getElementById(id), was = box.classList.contains('open');
+    chip.closest('.layer-body').querySelectorAll('.detail-box').forEach(b => b.classList.remove('open'));
+    chip.closest('.layer-body').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    if (!was) { box.classList.add('open'); chip.classList.add('active'); }
+  }
+  document.querySelectorAll('.layer-header')[1].click();
+</script>
+</body>
+</html>
